@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR = $(realpath $(dirname $0))
+DIR=$(realpath $(dirname $0))
 
 python3 -m pip install -r "$DIR"/ChatServer/requirements.txt
 npm --prefix "$DIR"/TelegramBot/ install "$DIR"/TelegramBot/
