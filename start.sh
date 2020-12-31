@@ -1,17 +1,10 @@
 #!/bin/bash
 
-function absoluteScriptDirPath {
-    SOURCE = $(if [ -z "${BASH_SOURCE[0]}"]; then echo $1; else echo ${BASH_SOURCE[0]}; fi)
-    while [ -h "$SOURCE" ]; do
-      DIR = $( cd -P $( dirname "$SOURCE") && pwd )
-      SOURCE = $(readlink "$SOURCE")
-      [[ $SOURCE != /* ]] && SOURCE = "$DIR/$SOURCE"
-    done
-    DIR = $( cd -P $( dirname "$SOURCE" ) && pwd )
-    echo $DIR
-}
+#!/bin/bash
+echo "The script you are running has basename `basename "$0"`, dirname `dirname "$0"`"
+echo "The present working directory is `pwd`"cho $DIR
 
-DIR = $(absoluteScriptDirPath $0)
+DIR = $(dirname "$0")
 
 python3 -m pip install -r "$DIR"/ChatServer/requirements.txt
 npm --prefix "$DIR"/TelegramBot/ install "$DIR"/TelegramBot/
