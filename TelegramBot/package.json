@@ -1,5 +1,5 @@
 {
-  "name": "bot",
+  "name": "telegrambot",
   "version": "1.0.0",
   "description": "",
   "main": "bot.js",
@@ -10,6 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "node-telegram-bot-api": "^0.51.0",
-    "websocket": "^1.0.33"
+    "ws": "^7.4.2"
   }
 }

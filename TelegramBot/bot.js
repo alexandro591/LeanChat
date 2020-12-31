@@ -2,7 +2,7 @@ process.env.NTBA_FIX_319 = 1;
 
 const environment  = require(__dirname + "/../environment.json")
 const TelegramBot = require('node-telegram-bot-api')
-const WebSocketClient = require('websocket').client;
+const WebSocketClient = require('ws').Client;
 const bots = []
 
 for(let room in environment.bots){
