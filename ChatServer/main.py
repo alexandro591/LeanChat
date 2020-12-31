@@ -86,7 +86,7 @@ async def chat(websocket, path):
         print(f"< {message}")
     
     elif message.get("type") == "sessions":
-        print("last 5 existing sessions:", message["sessions"][:-5])
+        print("last 5 existing sessions:", message["sessions"][-5:])
 
 
 start_chat = websockets.serve(register, port = PORT)
