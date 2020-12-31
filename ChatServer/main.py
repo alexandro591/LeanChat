@@ -130,7 +130,7 @@ async def chat(websocket, path):
 
 
 
-start_chat = websockets.serve(register, port = PORT)
+start_chat = websockets.serve(asyncio.run(register), port = PORT)
 
 asyncio.get_event_loop().run_until_complete(start_chat)
 asyncio.get_event_loop().run_forever()
