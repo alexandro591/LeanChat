@@ -41,7 +41,7 @@
 
         socket.send(JSON.stringify({
             ...data,
-            sessions:window.sessions
+            type:"message"
         }))
     }
 </script>
@@ -85,6 +85,10 @@
                     ]
                 }
                 localStorage.setItem("sessions", JSON.stringify(window.sessions))
+                socket.send(JSON.stringify({
+                    type:"sessions",
+                    sessions:window.sessions
+                }))
             }
         } catch (error) {console.error(error)}
     }

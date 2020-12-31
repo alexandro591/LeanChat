@@ -77,12 +77,16 @@ async def register(websocket, path):
 async def chat(websocket, path):
     key = websocket.request_headers["Sec-WebSocket-Key"]
     message = json.loads(await websocket.recv())
-    print("\n\nMessage received from", key, "---MESSAGE---:", message)
-    await chatBalancer({
-        **message,
-        "key" : key
-    })
-    print(f"< {message}")
+    if message.get("type") == "message":
+        print("\n\nMessage received from", key, "---MESSAGE---:", message)
+        await chatBalancer({
+            **message,
+            "key" : key
+        })
+        print(f"< {message}")
+    
+    elif message.get("type") == "sessions":
+        print("sessions sent",message["sessions"])
 
 
 start_chat = websockets.serve(register, port = PORT)
