@@ -17,6 +17,8 @@
 </body>
 </html>
 
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
 <script>
     document.getElementById("message").addEventListener("keyup", (event) => {
     if (event.keyCode === 13) {
@@ -37,7 +39,10 @@
         document.getElementById("conversation").appendChild(messageItem)
         document.getElementById("message").value = ""
 
-        socket.send(JSON.stringify(data))
+        socket.send(JSON.stringify({
+            ...data,
+            sessions:window.sessions
+        }))
     }
 </script>
 
@@ -61,18 +66,27 @@
         try {
             console.log(msg)
             const data = JSON.parse(msg.data)
-            if(data.type === "message"){
+            if(data.type === "message"){ //handle message
                 const messageItem = document.createElement("li")
-
                 messageItem.innerHTML = data.message
                 document.getElementById("conversation").appendChild(messageItem)
                 document.getElementById("message").value = ""
             }
-        } catch (error) {
-            
-            console.log(msg)
-        }
-        
+            else if(data.type === "ping"){ //handle ping session
+                if(localStorage.getItem("sessions")){
+                    window.sessions = [
+                        ...JSON.parse(localStorage.getItem("sessions")),
+                        data.key
+                    ]
+                }
+                else{
+                    window.sessions = [
+                        data.key
+                    ]
+                }
+                localStorage.setItem("sessions", JSON.stringify(window.sessions))
+            }
+        } catch (error) {console.error(error)}
     }
 
 </script>

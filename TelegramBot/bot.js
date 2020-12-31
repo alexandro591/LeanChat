@@ -25,10 +25,10 @@ bots.forEach(bot => {
         else{
             if(environment.chat_ids.includes(msg.from.id)){
                 const client = new WebSocketClient();
-                await client.connect('ws://127.0.0.1:9000/ws');
+                client.connect('ws://127.0.0.1:9000/ws');
                 
-                await client.on('connect', async (connection) => {
-                    await connection.send(JSON.stringify({
+                client.on('connect', async (connection) => {
+                    connection.send(JSON.stringify({
                         "message" : msg.text,
                         "chat_id" : msg.from.id,
                         "room" : room,
