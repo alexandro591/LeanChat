@@ -61,9 +61,14 @@ async def chatBalancer(msg):
 async def register(websocket, path):
     key = websocket.request_headers["Sec-WebSocket-Key"]
     print("New connection from",  key)
-    sessions[key] = {}
-    sessions[key]["key"] = key
-    sessions[key]["websocket"] = websocket
+    sessions[key] = {
+        "key" : key,
+        "websocket" : websocket
+    }
+    sessions[key]["websocket"].send(json.dumps({
+        "type" : "ping",
+        "message" : "successfully registered"
+    }))
     while True:
         await chat(websocket, path)
 

@@ -45,7 +45,8 @@
     const socket = new WebSocket("ws://alexandrotapia.ml:9000/ws");
     console.log("Attempting Connection...");
 
-    socket.onopen = () => {
+    socket.onopen = (e) => {
+        console.log(e)
         console.log("Successfully Connected");
     };
     
