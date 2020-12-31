@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# GET CURRENT SCRIPT DIRECTORY PATH
-DIR=$(dirname "$(readlink -f "$0")")
+DIR="$(dirname "$(readlink -f "$0")")"
 
 python3 -m pip install -r "$DIR"/ChatServer/requirements.txt
 npm --prefix "$DIR"/TelegramBot/ install "$DIR"/TelegramBot/
