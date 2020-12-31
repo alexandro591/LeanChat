@@ -28,10 +28,11 @@ with open(path + '/../environment.json') as bots_file:
         bots_list[name] = TelegramRooms(token, name, bot)
 
 #balancer
-async def chatBalancer(msg):
-    key = msg.get("key")
-    room = msg.get("room")
+async def chatBalancer(message):
+    key = message.get("key")
+    room = message.get("room")
     session = sessions.get(key)
+            
     if not room:
         if not session.get("room"):
             for room in bots_list:
@@ -42,20 +43,24 @@ async def chatBalancer(msg):
 
                     for chat_id in chat_ids:
                         try:
-                            bots_list[room].bot.send_message(chat_id=chat_id, text=msg["message"])
+                            bots_list[room].bot.send_message(chat_id=chat_id, text=message["message"])
                         except:
                             print(chat_id, "not subscribed for this chat")
                     break
         else:
             for chat_id in chat_ids:
                 try:
-                    await bots_list[session["room"]].bot.send_message(chat_id=chat_id, text=msg["message"])
+                    await bots_list[session["room"]].bot.send_message(chat_id=chat_id, text=message["message"])
                 except:
                     print(chat_id, "not subscribed for this chat")
     else:
         for key in sessions:
             if sessions[key].get("room") == room:
-                await sessions[key]["websocket"].send(json.dumps(msg))
+                await sessions[key]["websocket"].send(json.dumps(message))
+    
+
+    if message.get("name") and (not session.get("name")):
+        session["name"] = message["name"]
 
 #register new chat
 async def register(websocket, path):
