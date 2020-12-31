@@ -67,7 +67,8 @@ async def register(websocket, path):
     }
     await sessions[key]["websocket"].send(json.dumps({
         "type" : "ping",
-        "message" : "successfully registered"
+        "message" : "successfully registered",
+        "key" : key
     }))
     while True:
         await chat(websocket, path)
