@@ -45,9 +45,8 @@
     const socket = new WebSocket("ws://alexandrotapia.ml:9000/ws");
     console.log("Attempting Connection...");
 
-    socket.onopen = (e) => {
-        console.log(e)
-        console.log("Successfully Connected");
+    socket.onopen = event => {
+        console.log("Successfully Connected ", event);
     };
     
     socket.onclose = event => {
@@ -60,6 +59,7 @@
 
     socket.onmessage = (msg) => {
         try {
+            console.log(msg)
             const data = JSON.parse(msg.data)
             if(data.type === "message"){
                 const messageItem = document.createElement("li")
@@ -68,7 +68,6 @@
                 document.getElementById("conversation").appendChild(messageItem)
                 document.getElementById("message").value = ""
             }
-            console.log(data)
         } catch (error) {
             
             console.log(msg)
