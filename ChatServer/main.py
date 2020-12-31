@@ -13,10 +13,10 @@ class TelegramRooms():
         self.isBusy = False
 
 class ChatSession():
-    def __init__(self, token, name, bot):
-        self.token = token
-        self.visitor_name = name
-        self.bot = bot
+    def __init__(self, key, visitor_name, bot):
+        self.key = key
+        self.visitor_name = visitor_name
+        self.room = bot
         self.isBusy = False
 
 #initialize variables
@@ -57,13 +57,13 @@ async def chatBalancer(message):
         else:
             for chat_id in chat_ids:
                 try:
-                    await bots_list[session["room"]].bot.send_message(chat_id=chat_id, text=message["message"])
+                    bots_list[session["room"]].bot.send_message(chat_id=chat_id, text=message["message"])
                 except:
                     print(chat_id, "not subscribed for this chat")
     else:
         for key in sessions:
             if sessions[key].get("room") == room:
-                await sessions[key]["websocket"].send(json.dumps(message))
+                sessions[key]["websocket"].send(json.dumps(message))
     
 
     if message.get("name") and (not session.get("name")):
@@ -103,7 +103,7 @@ async def chat(websocket, path):
             
             #closing the conection
             try:
-                await sessions[key]["websocket"].close()
+                sessions[key]["websocket"].close()
                 
                 print(key, "successfully closed")
             except:
@@ -114,7 +114,7 @@ async def chat(websocket, path):
                 try:
                     for chat_id in chat_ids:
                         try:
-                            await bots_list[sessions[key]["room"]].bot.send_message(chat_id=chat_id, text="client disconected")
+                            bots_list[sessions[key]["room"]].bot.send_message(chat_id=chat_id, text="client disconected")
                         except:
                             pass
                     room = sessions[key]["room"]
