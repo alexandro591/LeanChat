@@ -12,6 +12,13 @@ class TelegramRooms():
         self.bot = bot
         self.isBusy = False
 
+class ChatSession():
+    def __init__(self, token, name, bot):
+    self.token = token
+    self.visitor_name = name
+    self.bot = bot
+    self.isBusy = False
+
 #initialize variables
 path = os.path.abspath(__file__).replace("/main.py","")
 bots_list = {}
@@ -95,11 +102,17 @@ async def chat(websocket, path):
         for key in message["sessions"][-6:-1]:
             try:
                 await sessions[key]["websocket"].close()
+                
                 print(key, "successfully closed")
             except:
                 print(key, "already closed")
             finally:
                 try:
+                    for chat_id in chat_ids:
+                        try:
+                            await bots_list[sessions[key]["room"]].bot.send_message(chat_id=chat_id, text="client disconected")
+                        except:
+                            pass
                     room = sessions[key]["room"]
                     bots_list[room].isBusy = False
                 except:
