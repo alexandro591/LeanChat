@@ -86,13 +86,19 @@ async def chat(websocket, path):
         print(f"< {message}")
     
     elif message.get("type") == "sessions":
+        print("closing last 5 existing sessions for", message["sessions"][-1])
         for key in message["sessions"][-6:-1]:
-            print("closing last 5 existing sessions for", message["sessions"][-1])
             try:
                 await sessions[key]["websocket"].close()
                 print(key, "successfully closed")
             except:
                 print(key, "already closed")
+            finally:
+                try:
+                    room = sessions[key]["room"]
+                    bots_list[room].isBusy = False
+                except:
+                    print(key, "was never assigned to a room")
 
 
 start_chat = websockets.serve(register, port = PORT)
