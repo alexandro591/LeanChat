@@ -1,0 +1,78 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="top">
+        <input type="text" placeholder="Your Name" id="name"><br>
+    </div>
+    <div id="conversation">
+    </div>
+    <div id="send">
+        <input type="text" placeholder="type here" id="message">
+        <button onclick="sendMessage()" id="send">Send</button>
+    </div>
+</body>
+</html>
+
+<script>
+    document.getElementById("message").addEventListener("keyup", (event) => {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        sendMessage()
+    }
+});
+    const sendMessage = () => {
+        const message = document.getElementById("message").value
+        const name = document.getElementById("name").value
+        const messageItem = document.createElement("li")
+        const data = {
+            message,
+            name
+        }
+
+        messageItem.innerHTML = data.message
+        document.getElementById("conversation").appendChild(messageItem)
+        document.getElementById("message").value = ""
+
+        socket.send(JSON.stringify(data))
+    }
+</script>
+
+<script>
+    const socket = new WebSocket("ws://127.0.0.1:8080/ws");
+    console.log("Attempting Connection...");
+
+    socket.onopen = () => {
+        console.log("Successfully Connected");
+    };
+    
+    socket.onclose = event => {
+        console.log("Socket Closed Connection: ", event);
+    };
+
+    socket.onerror = error => {
+        console.log("Socket Error: ", error);
+    };
+
+    socket.onmessage = (msg) => {
+        try {
+            const data = JSON.parse(msg.data)
+            if(data.type === "message"){
+                const messageItem = document.createElement("li")
+
+                messageItem.innerHTML = data.message
+                document.getElementById("conversation").appendChild(messageItem)
+                document.getElementById("message").value = ""
+            }
+            console.log(data)
+        } catch (error) {
+            
+            console.log(msg)
+        }
+        
+    }
+
+</script>
