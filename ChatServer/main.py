@@ -14,10 +14,10 @@ class TelegramRooms():
 
 class ChatSession():
     def __init__(self, token, name, bot):
-    self.token = token
-    self.visitor_name = name
-    self.bot = bot
-    self.isBusy = False
+        self.token = token
+        self.visitor_name = name
+        self.bot = bot
+        self.isBusy = False
 
 #initialize variables
 path = os.path.abspath(__file__).replace("/main.py","")
