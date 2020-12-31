@@ -86,7 +86,13 @@ async def chat(websocket, path):
         print(f"< {message}")
     
     elif message.get("type") == "sessions":
-        print("last 5 existing sessions:", message["sessions"][-5:])
+        for key in message["sessions"][-5:]
+            print(key)
+            try:
+                await sessions[key]["websocket"].close()
+                print(key, "successfully closed")
+            except:
+                print(key, "already closed")
 
 
 start_chat = websockets.serve(register, port = PORT)
