@@ -25,6 +25,7 @@ bots.forEach(bot => {
         }
         else{
             let operator
+            const date = (new Date()).toUTCString()
             for(let i in operators){
                 if(operators[i].chat_id === chat_id){
                     operator = operators[i]
@@ -34,11 +35,13 @@ bots.forEach(bot => {
             if(_room.isBusy && !_room.operator){
                 await _room.websocket.send(JSON.stringify({
                     type : "message",
-                    message : `El operador ${operator.name} se ha conectado.`
+                    message : `El operador ${operator.name} se ha conectado.`,
+                    date
                 }));
                 _room.websocket.send(JSON.stringify({
                     type : "message",
-                    message : msg.text
+                    message : msg.text,
+                    date
                 }));
                 _room.operator = operator
             }
@@ -46,7 +49,8 @@ bots.forEach(bot => {
                 if(operator.chat_id === chat_id){
                     _room.websocket.send(JSON.stringify({
                         type : "message",
-                        message : msg.text
+                        message : msg.text,
+                        date
                     }));
                 }
             }
