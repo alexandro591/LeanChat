@@ -1,5 +1,5 @@
 {
-  "name": "lean_chat",
+  "name": "server",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "node-telegram-bot-api": "^0.51.0",
-    "websocket": "^1.0.33"
+    "uuid": "^8.3.2",
+    "ws": "^7.4.2"
   }
 }

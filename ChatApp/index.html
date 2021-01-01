@@ -20,12 +20,14 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
 <script>
+    let uuidv4
+
     document.getElementById("message").addEventListener("keyup", (event) => {
-    if (event.keyCode === 13) {
-        event.preventDefault();
-        sendMessage()
-    }
-});
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            sendMessage()
+        }
+    });
     const sendMessage = () => {
         const message = document.getElementById("message").value
         const name = document.getElementById("name").value
@@ -41,54 +43,46 @@
 
         socket.send(JSON.stringify({
             ...data,
-            type:"message"
+            type:"message",
+            uuidv4,
         }))
     }
 </script>
 
 <script>
-    const socket = new WebSocket("ws://alexandrotapia.ml:9000/ws");
+
+    const socket = new WebSocket("ws://localhost:9000");
     console.log("Attempting Connection...");
 
-    socket.onopen = event => {
-        console.log("Successfully Connected ", event);
-    };
-    
-    socket.onclose = event => {
-        console.log("Socket Closed Connection: ", event);
-    };
+    socket.onopen = event => console.log("Successfully Connected:", event);
+    socket.onclose = event => console.log("Socket Closed Connection:", event);
+    socket.onerror = error => console.log("Socket Error:", error);
 
-    socket.onerror = error => {
-        console.log("Socket Error: ", error);
-    };
-
-    socket.onmessage = (msg) => {
+    socket.onmessage = (message) => {
         try {
-            console.log(msg)
-            const data = JSON.parse(msg.data)
+            const data = JSON.parse(message.data)
+            console.log(data)
             if(data.type === "message"){ //handle message
                 const messageItem = document.createElement("li")
                 messageItem.innerHTML = data.message
                 document.getElementById("conversation").appendChild(messageItem)
                 document.getElementById("message").value = ""
             }
-            else if(data.type === "ping"){ //handle ping session
-                if(localStorage.getItem("sessions")){
-                    window.sessions = [
-                        ...JSON.parse(localStorage.getItem("sessions")),
-                        data.key
-                    ]
-                }
-                else{
-                    window.sessions = [
-                        data.key
-                    ]
-                }
-                localStorage.setItem("sessions", JSON.stringify(window.sessions))
+            else if(data.type === "first"){ //handle ping session
+                try {
+                    uuidv4 = JSON.parse(localStorage.getItem("sessions")).uuidv4
+                } catch{}
                 socket.send(JSON.stringify({
-                    type:"sessions",
-                    sessions:window.sessions
+                    type : "register",
+                    message : "register new visitor",
+                    uuidv4
                 }))
+            }
+            else if(data.type === "register"){
+                const session ={
+                    uuidv4 : data.uuidv4
+                }
+                localStorage.setItem("sessions", JSON.stringify(session))
             }
         } catch (error) {console.error(error)}
     }
