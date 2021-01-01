@@ -29,10 +29,11 @@ const interval = setInterval( () => {
     for(let sessionKey in sessions){
         if(!sessionKeys.includes(sessionKey)){
             sessions[sessionKey].room.sendBroadcastToOperators("Cliente desconectado", operators)
+            sessions[sessionKey].room.isBusy = false
             delete sessions[sessionKey]
         }
     }
-    console.log(total, "clientes conectados")
+    // console.log(total, "clientes conectados")
 }, 3000);
   
 WebSocketServer.on('close', () => {
@@ -43,8 +44,9 @@ WebSocketServer.on('close', () => {
 WebSocketServer.on('connection', (ws, request) => {
     ws.sessionKey = getKey(request)
 
-    ws.on('message', incoming = message => {
+    ws.on('message', async message => {
         const messageObject = JSON.parse(message)
+        console.log(messageObject)
         const sessionKey = getKey(request)
 
         if(messageObject.type === "register" && !messageObject.uuidv4){
@@ -65,7 +67,6 @@ WebSocketServer.on('connection', (ws, request) => {
             if(!sessions[sessionKey]){
                 for(let i in rooms){
                     if(!rooms[i].isBusy){
-                        console.log(messageObject)
                         const visitor = new Visitor(
                             messageObject.name,
                             messageObject.first_name,
@@ -74,6 +75,7 @@ WebSocketServer.on('connection', (ws, request) => {
                             messageObject.email,
                             messageObject.phone
                         )
+                        await rooms[i].sendMessage(visitor.name + " se ha conectado.", operators)
                         rooms[i].sendMessage(messageObject.message, operators)
                         rooms[i].isBusy = true
                         rooms[i].visitor = visitor
