@@ -50,17 +50,15 @@
 </script>
 
 <script>
-    let socket = new WebSocket("ws://localhost:9000")
-    console.log("Attempting Connection to localhost...")
+    if(window.location.hostname === "localhost")
+        const socket = new WebSocket("ws://localhost:9000")
+    else
+        const socket = new WebSocket("ws://alexandrotapia.ml:9000")
+    console.log("Attempting Connection...")
 
     socket.onopen = event => console.log("Successfully Connected:", event)
     socket.onclose = event => console.log("Socket Closed Connection:", event)
-    socket.onerror = error => {
-        console.log("Socket Closed Connection:", error)
-        socket = new WebSocket("ws://alexandrotapia.ml:9000")
-        console.log("Attempting Connection to external server...")
-    }
-
+    socket.onerror = error => console.log("Socket Closed Connection:", error)
     socket.onmessage = (message) => {
         try {
             const data = JSON.parse(message.data)
