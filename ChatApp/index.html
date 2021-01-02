@@ -24,10 +24,10 @@
 
     document.getElementById("message").addEventListener("keyup", (event) => {
         if (event.keyCode === 13) {
-            event.preventDefault();
+            event.preventDefault()
             sendMessageFromClient()
         }
-    });
+    })
     const sendMessage = () => {
         const message = document.getElementById("message").value
         const name = document.getElementById("name").value
@@ -50,15 +50,15 @@
 </script>
 
 <script>
-    let socket = new WebSocket("ws://localhost:9000");
-    console.log("Attempting Connection to localhost...");
+    let socket = new WebSocket("ws://localhost:9000")
+    console.log("Attempting Connection to localhost...")
 
-    socket.onopen = event => console.log("Successfully Connected:", event);
-    socket.onclose = event => console.log("Socket Closed Connection:", event);
+    socket.onopen = event => console.log("Successfully Connected:", event)
+    socket.onclose = event => console.log("Socket Closed Connection:", event)
     socket.onerror = error => {
-        console.log("Socket Closed Connection:", error);
-        socket = new WebSocket("ws://alexandrotapia.ml:9000");
-        console.log("Attempting Connection to external server...");
+        console.log("Socket Closed Connection:", error)
+        socket = new WebSocket("ws://alexandrotapia.ml:9000")
+        console.log("Attempting Connection to external server...")
     }
 
     socket.onmessage = (message) => {

@@ -1,4 +1,4 @@
-process.env.NTBA_FIX_319 = 1;
+process.env.NTBA_FIX_319 = 1
 
 const environment  = require("../../environment")
 const bots = environment.bots
@@ -7,21 +7,21 @@ const TelegramBot = require('node-telegram-bot-api')
 
 const Room = require('../Models/Room')
 
-const operators = require('../Functions/createOperators');
+const operators = require('../Functions/createOperators')
 
 const rooms = []
 
 bots.forEach(bot => {
-    const token = bot.token;
+    const token = bot.token
     const _room = new Room(
         room = bot.room,
         telegramBot = new TelegramBot(token, {polling: true}),
     )
 
     _room.telegramBot.on('message', async (msg) => {
-        const chat_id = msg.chat.id;
+        const chat_id = msg.chat.id
         if(msg.text === "/getChatId"){
-            _room.telegramBot.sendMessageFromClient(chatId, 'Your chat id is: ' + chat_id);
+            _room.telegramBot.sendMessageFromClient(chatId, 'Your chat id is: ' + chat_id)
         }
         else{
             let operator
@@ -37,14 +37,14 @@ bots.forEach(bot => {
                     type : "message",
                     message : `El operador ${operator.name} se ha conectado.`,
                     date
-                });
+                })
                 await _room.sendMessageFromClient(`El operador ${operator.name} se ha conectado.`, operators)
 
                 await _room.sendMessageToClient({
                     type : "message",
                     message : msg.text,
                     date
-                });
+                })
                 _room.operator = operator
             }
             else if(_room.isBusy){
@@ -53,13 +53,13 @@ bots.forEach(bot => {
                         type : "message",
                         message : msg.text,
                         date
-                    });
+                    })
                 }
             }
         }
-    });
+    })
 
     rooms.push(_room)
-});
+})
 
 module.exports = rooms
