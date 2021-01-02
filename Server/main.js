@@ -1,5 +1,6 @@
-const environment  = require("../environment")
+const environment  = require("../Environment/environment")
 const ports = environment.ports
+const autoBotConfig = environment.autoBot
 
 //npm packages
 const WebSocket = require('ws')
@@ -15,6 +16,9 @@ const {operators, rooms} = require('./Functions/shared')
 //models
 const Session = require('./Models/Session')
 const Visitor = require('./Models/Visitor')
+const AutoBot = require('./Models/AutoBot')
+
+const autoBot = new AutoBot(autoBotConfig.name, autoBotConfig.enabled)
 
 const sessions = {}
 
@@ -86,7 +90,14 @@ WebSocketServer.on('connection', (ws, request) => {
                         await rooms[i].sendMessageFromClient(messageObject.message, operators)
 
                         sessions[messageObject.uuidv4] =  new Session((new Date()).toUTCString(), rooms[i])
-                        
+                        if(autoBot.enabled){
+                            sessions[messageObject.uuidv4].room.sendMessageToClient({
+                                type : "botMessage",
+                                message : autoBot.greet(),
+                                date : (new Date().toUTCString())
+                            })
+                        }
+
                         break
                     }
                 }
@@ -95,6 +106,13 @@ WebSocketServer.on('connection', (ws, request) => {
                 sessions[messageObject.uuidv4].room.sendMessageFromClient(messageObject.message, operators)
                 if(!sessions[messageObject.uuidv4].room.websockets.includes(ws)){
                     sessions[messageObject.uuidv4].room.websockets.push(ws)
+                }
+                if(autoBot.enabled && !sessions[messageObject.uuidv4].room.operator){
+                    sessions[messageObject.uuidv4].room.sendMessageToClient({
+                        type : "botMessage",
+                        message : autoBot.talk(messageObject.message),
+                        date : (new Date().toUTCString())
+                    })
                 }
             }
         }
@@ -108,5 +126,6 @@ WebSocketServer.on('connection', (ws, request) => {
         message : "conection successfull",
         uuidv4 : _uuidv4
     }
+
     ws.send(JSON.stringify(firstMessage))
 })

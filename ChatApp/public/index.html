@@ -67,7 +67,7 @@
         try {
             const messageObject = JSON.parse(message.data)
             console.log(messageObject)
-            if(messageObject.type === "message"){ //handle message
+            if(messageObject.type === "message" || messageObject.type === "botMessage"){ //handle message
                 const messageItem = document.createElement("li")
                 messageItem.innerHTML = messageObject.message
                 document.getElementById("conversation").appendChild(messageItem)

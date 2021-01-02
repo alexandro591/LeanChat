@@ -1,4 +1,4 @@
-const environment  = require("../../environment")
+const environment  = require("../../Environment/environment")
 const chat_ids = environment.chat_ids
 
 const Operator = require('../Models/Operator')

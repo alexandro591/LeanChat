@@ -1,6 +1,6 @@
 process.env.NTBA_FIX_319 = 1
 
-const environment  = require("../../environment")
+const environment  = require("../../Environment/environment")
 const bots = environment.bots
 
 const TelegramBot = require('node-telegram-bot-api')

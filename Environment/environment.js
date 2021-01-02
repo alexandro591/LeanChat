@@ -37,5 +37,9 @@ module.exports =
     ports : {
         server : 9000,
         chat_app : 9001
+    },
+    autoBot : {
+        enabled : true,
+        name : "LeanChatBot"
     }
 }
