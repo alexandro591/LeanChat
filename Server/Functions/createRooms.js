@@ -35,10 +35,10 @@ bots.forEach(bot => {
             if(_room.isBusy && !_room.operator){
                 await _room.sendMessageToClient({
                     type : "message",
-                    message : `El operador ${operator.name} se ha conectado.`,
+                    message : ` ${operator.name} se ha conectado.`,
                     date
                 })
-                await _room.sendMessageFromClient(`El operador ${operator.name} se ha conectado.`, operators)
+                await _room.sendMessageFromClient(`<b>El operador ${operator.name} se ha conectado.</b>`, operators)
 
                 await _room.sendMessageToClient({
                     type : "message",
