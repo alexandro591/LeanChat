@@ -28,18 +28,18 @@ const interval = setInterval( () => {
         total ++
     })
     for(let uuidv4 in sessions){
-        sessions[uuidv4].room.websockets.forEach(ws => {
+        sessions[uuidv4].websockets.forEach(ws => {
             if(!_sessions.includes(ws)){
                 removeItemAll(sessions[uuidv4].room.websockets, ws)
             }
         })
-        if(sessions[uuidv4].room.websockets.length === 0){
+        if(sessions[uuidv4].websockets.length === 0){
             sessions[uuidv4].room.sendBroadcastToOperators("<b><i>--- El cliente se ha desconectado. ---</i></b>", operators)
             sessions[uuidv4].room.cleanRoom()
             delete sessions[uuidv4]
         }
     }
-    console.log(total, "clientes conectados")
+    // console.log(total, "clientes conectados")
 }, 1000)
   
 WebSocketServer.on('close', () => {
@@ -55,18 +55,15 @@ WebSocketServer.on('connection', (ws, request) => {
         console.log(messageObject)
         const sessionKey = getKey(request)
 
-        if(messageObject.type === "register" && !messageObject.uuidv4){
-            const _uuidv4 = uuidv4()
+        if(messageObject.type === "register"){
             const registrationMessage = {
                 type : "register",
                 message : "registered successfully",
-                sessionKey,
-                uuidv4 : _uuidv4
             }
             ws.send(JSON.stringify(registrationMessage))
-            console.log("New visitor registered with key:", sessionKey, "and uuidv4:", _uuidv4)
+            console.log("New visitor registered with key:", sessionKey, "and uuidv4:", messageObject.uuidv4)
         }
-        else if(messageObject.type === "register"){
+        else if(messageObject.type === "visitor"){
             console.log(`Visitor ${messageObject.uuidv4} has connected`)
         }
         else if(messageObject.type === "message"){
@@ -96,8 +93,8 @@ WebSocketServer.on('connection', (ws, request) => {
             }
             else{
                 sessions[messageObject.uuidv4].room.sendMessageFromClient(messageObject.message, operators)
-                if(!sessions[messageObject.uuidv4].room.websockets.includes(ws)){
-                    sessions[messageObject.uuidv4].room.websockets.push(ws)
+                if(!sessions[messageObject.uuidv4].websockets.includes(ws)){
+                    sessions[messageObject.uuidv4].websockets.push(ws)
                 }
             }
         }
@@ -106,10 +103,11 @@ WebSocketServer.on('connection', (ws, request) => {
     
     const sessionKey = getKey(request)
     console.log(`New conection from: ${sessionKey}`)
+    const _uuidv4 = uuidv4()
     const firstMessage = {
         type : "first",
         message : "conection successfull",
-        sessionKey,
+        uuidv4 : _uuidv4
     }
     ws.send(JSON.stringify(firstMessage))
 })

@@ -20,8 +20,10 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
 <script>
-    let uuidv4
-
+    var uuidv4
+    try {
+        uuidv4 = JSON.parse(localStorage.getItem("sessions")).uuidv4
+    } catch {}
     document.getElementById("message").addEventListener("keyup", (event) => {
         if (event.keyCode === 13) {
             event.preventDefault()
@@ -32,17 +34,17 @@
         const message = document.getElementById("message").value
         const name = document.getElementById("name").value
         const messageItem = document.createElement("li")
-        const data = {
+        const messageObject = {
             message,
             name
         }
 
-        messageItem.innerHTML = data.message
+        messageItem.innerHTML = messageObject.message
         document.getElementById("conversation").appendChild(messageItem)
         document.getElementById("message").value = ""
 
         socket.send(JSON.stringify({
-            ...data,
+            ...messageObject,
             type:"message",
             uuidv4,
         }))
@@ -51,7 +53,7 @@
 
 <script>
     let socket
-    if(window.location.hostname === "localhost"){
+    if(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"){
         socket = new WebSocket("ws://localhost:9000")
     } else{
         socket = new WebSocket("ws://alexandrotapia.ml:9000")
@@ -63,29 +65,33 @@
     socket.onerror = error => console.log("Socket Closed Connection:", error)
     socket.onmessage = (message) => {
         try {
-            const data = JSON.parse(message.data)
-            console.log(data)
-            if(data.type === "message"){ //handle message
+            const messageObject = JSON.parse(message.data)
+            console.log(messageObject)
+            if(messageObject.type === "message"){ //handle message
                 const messageItem = document.createElement("li")
-                messageItem.innerHTML = data.message
+                messageItem.innerHTML = messageObject.message
                 document.getElementById("conversation").appendChild(messageItem)
                 document.getElementById("message").value = ""
             }
-            else if(data.type === "first"){ //handle ping session
-                try {
-                    uuidv4 = JSON.parse(localStorage.getItem("sessions")).uuidv4
-                } catch{}
-                socket.send(JSON.stringify({
-                    type : "register",
-                    message : "register new visitor",
-                    uuidv4
-                }))
-            }
-            else if(data.type === "register"){
-                const session ={
-                    uuidv4 : data.uuidv4
+            else if(messageObject.type === "first"){ //handle ping session
+                if(!uuidv4){
+                    uuidv4 = messageObject.uuidv4
+                    localStorage.setItem("sessions",JSON.stringify({
+                        uuidv4
+                    }))
+                    socket.send(JSON.stringify({
+                        type : "register",
+                        message : "register new visitor",
+                        uuidv4
+                    }))
                 }
-                localStorage.setItem("sessions", JSON.stringify(session))
+                else{
+                    socket.send(JSON.stringify({
+                        type : "visitor",
+                        message : "existing visitor",
+                        uuidv4
+                    }))
+                }
             }
         } catch (error) {console.error(error)}
     }
