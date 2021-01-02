@@ -34,7 +34,6 @@ module.exports = Room = class{
         await Promise.all(
             this.websockets.map(websocket => {
                 return websocket.send(JSON.stringify(messageObject))
-                .catch(() => {})
             })
         )
     }
