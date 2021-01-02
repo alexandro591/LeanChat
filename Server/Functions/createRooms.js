@@ -46,7 +46,7 @@ bots.forEach(bot => {
                 _room.operator = operator
             }
             else if(_room.isBusy){
-                if(operator.chat_id === chat_id){
+                if(_room.operator.chat_id === chat_id){
                     _room.websocket.send(JSON.stringify({
                         type : "message",
                         message : msg.text,
