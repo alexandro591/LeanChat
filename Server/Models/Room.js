@@ -9,14 +9,14 @@ module.exports = Room = class{
     }
 
     sendMessageToOperator = async (message) => {
-        await this.telegramBot.sendMessageFromClient(this.operator.chat_id, message, {parse_mode : "HTML"})
+        await this.telegramBot.sendMessage(this.operator.chat_id, message, {parse_mode : "HTML"})
         .catch(() => {})
     }
 
     sendBroadcastToOperators = async (message, operators) => {
         await Promise.all(
             operators.map(operator => {
-                return this.telegramBot.sendMessageFromClient(operator.chat_id, message, {parse_mode : "HTML"})
+                return this.telegramBot.sendMessage(operator.chat_id, message, {parse_mode : "HTML"})
                 .catch(() => {})
             })
         )
