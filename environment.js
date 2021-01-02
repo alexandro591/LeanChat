@@ -35,6 +35,7 @@ module.exports =
         },
     ],
     ports : {
-        server : 9000
+        server : 9000,
+        chat_app : 9001
     }
 }
