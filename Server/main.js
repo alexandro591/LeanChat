@@ -7,6 +7,7 @@ const uuidv4 = require('uuid').v4;
 
 //utils
 const getKey = require('./Utils/getKey')
+const {removeItemAll} = require('./Utils/removeFromArray')
 
 //functions
 const {operators, rooms} = require('./Functions/shared')
@@ -21,20 +22,25 @@ const WebSocketServer = new WebSocket.Server({port: ports.server});
 
 const interval = setInterval( () => {
     let total = 0
-    const sessionKeys = []
+    const _sessions = []
     WebSocketServer.clients.forEach( async ws => {
-        sessionKeys.push(ws.sessionKey)
+        _sessions.push(ws)
         total ++
     });
-    for(let sessionKey in sessions){
-        if(!sessionKeys.includes(sessionKey)){
-            sessions[sessionKey].room.sendBroadcastToOperators("<b><i>--- El cliente se ha desconectado. ---</i></b>", operators)
-            sessions[sessionKey].room.cleanRoom()
-            delete sessions[sessionKey]
+    for(let uuidv4 in sessions){
+        sessions[uuidv4].room.websockets.forEach(ws => {
+            if(!_sessions.includes(ws)){
+                removeItemAll(sessions[uuidv4].room.websockets, ws)
+            }
+        });
+        if(sessions[uuidv4].room.websockets.length === 0){
+            sessions[uuidv4].room.sendBroadcastToOperators("<b><i>--- El cliente se ha desconectado. ---</i></b>", operators)
+            sessions[uuidv4].room.cleanRoom()
+            delete sessions[uuidv4]
         }
     }
-    // console.log(total, "clientes conectados")
-}, 3000);
+    console.log(total, "clientes conectados")
+}, 1000);
   
 WebSocketServer.on('close', () => {
     clearInterval(interval);
@@ -64,7 +70,7 @@ WebSocketServer.on('connection', (ws, request) => {
             console.log(`Visitor ${messageObject.uuidv4} has connected`)
         }
         else if(messageObject.type === "message"){
-            if(!sessions[sessionKey]){
+            if(!sessions[messageObject.uuidv4]){
                 for(let i in rooms){
                     if(!rooms[i].isBusy){
                         const visitor = new Visitor(
@@ -77,19 +83,22 @@ WebSocketServer.on('connection', (ws, request) => {
                         )
                         rooms[i].isBusy = true
                         rooms[i].visitor = visitor
-                        rooms[i].websocket = ws
+                        rooms[i].websockets = [ws]
 
                         await rooms[i].sendMessage("<b><i>--- " + visitor.name + " se ha conectado." + " ---</i></b>", operators)
                         await rooms[i].sendMessage(messageObject.message, operators)
 
-                        sessions[sessionKey] =  new Session((new Date()).toUTCString(), rooms[i])
+                        sessions[messageObject.uuidv4] =  new Session((new Date()).toUTCString(), rooms[i])
                         
                         break;
                     }
                 }
             }
             else{
-                sessions[sessionKey].room.sendMessage(messageObject.message, operators)
+                sessions[messageObject.uuidv4].room.sendMessage(messageObject.message, operators)
+                if(!sessions[messageObject.uuidv4].room.websockets.includes(ws)){
+                    sessions[messageObject.uuidv4].room.websockets.push(ws)
+                }
             }
         }
         

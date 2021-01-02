@@ -1,11 +1,11 @@
 module.exports = Room = class{
-    constructor(name, telegramBot, isBusy = false, visitor = null, operator = null, websocket = null){
+    constructor(name, telegramBot, isBusy = false, visitor = null, operator = null, websockets = null){
         this.name = name
         this.telegramBot = telegramBot
         this.isBusy = isBusy
         this.operator = operator
         this.visitor = visitor
-        this.websocket = websocket
+        this.websockets = websockets
     }
 
     sendMessageToOperator = async (message) => {
@@ -29,6 +29,13 @@ module.exports = Room = class{
         else{
             await this.sendBroadcastToOperators(message, operators)
         }
+    }
+    sendMessageToClient = async (messageObject) => {
+        await Promise.all(
+            this.websockets.map(websocket => {
+                return websocket.send(JSON.stringify(messageObject));
+            })
+        )
     }
     cleanRoom = () => {
         this.visitor = null

@@ -54,12 +54,12 @@
     console.log("Attempting Connection to localhost...");
 
     socket.onopen = event => console.log("Successfully Connected:", event);
-    socket.onclose = event => {
-        console.log("Socket Closed Connection:", event);
+    socket.onclose = event => console.log("Socket Closed Connection:", event);
+    socket.onerror = error => {
+        console.log("Socket Closed Connection:", error);
         socket = new WebSocket("ws://alexandrotapia.ml:9000");
         console.log("Attempting Connection to external server...");
     }
-    socket.onerror = error => console.log("Socket Error:", error);
 
     socket.onmessage = (message) => {
         try {

@@ -33,27 +33,27 @@ bots.forEach(bot => {
                 }
             }
             if(_room.isBusy && !_room.operator){
-                await _room.websocket.send(JSON.stringify({
+                await _room.sendMessageToClient({
                     type : "message",
                     message : `El operador ${operator.name} se ha conectado.`,
                     date
-                }));
+                });
                 await _room.sendMessage(`El operador ${operator.name} se ha conectado.`, operators)
 
-                await _room.websocket.send(JSON.stringify({
+                await _room.sendMessageToClient({
                     type : "message",
                     message : msg.text,
                     date
-                }));
+                });
                 _room.operator = operator
             }
             else if(_room.isBusy){
                 if(_room.operator.chat_id === chat_id){
-                    _room.websocket.send(JSON.stringify({
+                    await _room.sendMessageToClient({
                         type : "message",
                         message : msg.text,
                         date
-                    }));
+                    });
                 }
             }
         }
