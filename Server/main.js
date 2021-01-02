@@ -3,7 +3,7 @@ const ports = environment.ports
 
 //npm packages
 const WebSocket = require('ws');
-const { v4 : uuidv4 } = require('uuid');
+const uuidv4 = require('uuid').v4;
 
 //utils
 const getKey = require('./Utils/getKey')
@@ -28,8 +28,8 @@ const interval = setInterval( () => {
     });
     for(let sessionKey in sessions){
         if(!sessionKeys.includes(sessionKey)){
-            sessions[sessionKey].room.sendBroadcastToOperators("Cliente desconectado", operators)
-            sessions[sessionKey].room.isBusy = false
+            sessions[sessionKey].room.sendBroadcastToOperators("<b><i>--- El cliente se ha desconectado. ---</i></b>", operators)
+            sessions[sessionKey].room.cleanRoom()
             delete sessions[sessionKey]
         }
     }
@@ -75,13 +75,14 @@ WebSocketServer.on('connection', (ws, request) => {
                             messageObject.email,
                             messageObject.phone
                         )
-                        await rooms[i].sendMessage(visitor.name + " se ha conectado.", operators)
-                        rooms[i].sendMessage(messageObject.message, operators)
                         rooms[i].isBusy = true
                         rooms[i].visitor = visitor
                         rooms[i].websocket = ws
 
-                        sessions[sessionKey] =  new Session(visitor, null, rooms[i])
+                        await rooms[i].sendMessage("<b><i>--- " + visitor.name + " se ha conectado." + " ---</i></b>", operators)
+                        await rooms[i].sendMessage(messageObject.message, operators)
+
+                        sessions[sessionKey] =  new Session((new Date()).toUTCString(), rooms[i])
                         
                         break;
                     }

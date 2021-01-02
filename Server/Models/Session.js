@@ -1,7 +1,6 @@
 module.exports = Session = class{
-    constructor(visitor, operator = null, room){
-        this.visitor = visitor,
-        this.operator = operator,
+    constructor(date, room){
+        this.date = date
         this.room = room
     }
 }

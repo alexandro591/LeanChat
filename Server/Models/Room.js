@@ -8,24 +8,32 @@ module.exports = Room = class{
         this.websocket = websocket
     }
 
-    sendMessageToOperator = (message) => {
-        this.telegramBot.sendMessage(this.operator.chat_id, message)
+    sendMessageToOperator = async (message) => {
+        await this.telegramBot.sendMessage(this.operator.chat_id, message, {parse_mode : "HTML"})
         .catch(() => {})
     }
 
-    sendBroadcastToOperators = (message, operators) => {
-        operators.forEach(operator => {
-            this.telegramBot.sendMessage(operator.chat_id, message)
-            .catch(() => {})
-        });
+    sendBroadcastToOperators = async (message, operators) => {
+        await Promise.all(
+            operators.map(operator => {
+                return this.telegramBot.sendMessage(operator.chat_id, message, {parse_mode : "HTML"})
+                .catch(() => {})
+            })
+        )
     }
 
-    sendMessage = (message, operators = null) => {
+    sendMessage = async (message, operators = null) => {
         if(this.operator){
-            this.sendMessageToOperator(message)
+            await this.sendMessageToOperator(message)
         }
         else{
-            this.sendBroadcastToOperators(message, operators)
+            await this.sendBroadcastToOperators(message, operators)
         }
+    }
+    cleanRoom = () => {
+        this.visitor = null
+        this.operator = null
+        this.isBusy = null
+        this.websocket = null
     }
 }

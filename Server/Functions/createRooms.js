@@ -38,7 +38,9 @@ bots.forEach(bot => {
                     message : `El operador ${operator.name} se ha conectado.`,
                     date
                 }));
-                _room.websocket.send(JSON.stringify({
+                await _room.sendMessage(`El operador ${operator.name} se ha conectado.`, operators)
+
+                await _room.websocket.send(JSON.stringify({
                     type : "message",
                     message : msg.text,
                     date
