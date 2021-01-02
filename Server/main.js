@@ -98,7 +98,6 @@ WebSocketServer.on('connection', (ws, request) => {
                 }
             }
         }
-        
     })
     
     const sessionKey = getKey(request)
