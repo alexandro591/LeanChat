@@ -50,10 +50,12 @@
 </script>
 
 <script>
-    if(window.location.hostname === "localhost")
-        const socket = new WebSocket("ws://localhost:9000")
-    else
-        const socket = new WebSocket("ws://alexandrotapia.ml:9000")
+    let socket
+    if(window.location.hostname === "localhost"){
+        socket = new WebSocket("ws://localhost:9000")
+    } else{
+        socket = new WebSocket("ws://alexandrotapia.ml:9000")
+    }
     console.log("Attempting Connection...")
 
     socket.onopen = event => console.log("Successfully Connected:", event)
