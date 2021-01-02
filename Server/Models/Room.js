@@ -9,20 +9,20 @@ module.exports = Room = class{
     }
 
     sendMessageToOperator = async (message) => {
-        await this.telegramBot.sendMessage(this.operator.chat_id, message, {parse_mode : "HTML"})
+        await this.telegramBot.sendMessageFromClient(this.operator.chat_id, message, {parse_mode : "HTML"})
         .catch(() => {})
     }
 
     sendBroadcastToOperators = async (message, operators) => {
         await Promise.all(
             operators.map(operator => {
-                return this.telegramBot.sendMessage(operator.chat_id, message, {parse_mode : "HTML"})
+                return this.telegramBot.sendMessageFromClient(operator.chat_id, message, {parse_mode : "HTML"})
                 .catch(() => {})
             })
         )
     }
 
-    sendMessage = async (message, operators = null) => {
+    sendMessageFromClient = async (message, operators = null) => {
         if(this.operator){
             await this.sendMessageToOperator(message)
         }
@@ -33,7 +33,8 @@ module.exports = Room = class{
     sendMessageToClient = async (messageObject) => {
         await Promise.all(
             this.websockets.map(websocket => {
-                return websocket.send(JSON.stringify(messageObject));
+                return websocket.send(JSON.stringify(messageObject))
+                .catch(() => {})
             })
         )
     }

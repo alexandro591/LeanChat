@@ -2,8 +2,8 @@ const environment  = require("../environment")
 const ports = environment.ports
 
 //npm packages
-const WebSocket = require('ws');
-const uuidv4 = require('uuid').v4;
+const WebSocket = require('ws')
+const uuidv4 = require('uuid').v4
 
 //utils
 const getKey = require('./Utils/getKey')
@@ -18,7 +18,7 @@ const Visitor = require('./Models/Visitor')
 
 const sessions = {}
 
-const WebSocketServer = new WebSocket.Server({port: ports.server});
+const WebSocketServer = new WebSocket.Server({port: ports.server})
 
 const interval = setInterval( () => {
     let total = 0
@@ -26,13 +26,13 @@ const interval = setInterval( () => {
     WebSocketServer.clients.forEach( async ws => {
         _sessions.push(ws)
         total ++
-    });
+    })
     for(let uuidv4 in sessions){
         sessions[uuidv4].room.websockets.forEach(ws => {
             if(!_sessions.includes(ws)){
                 removeItemAll(sessions[uuidv4].room.websockets, ws)
             }
-        });
+        })
         if(sessions[uuidv4].room.websockets.length === 0){
             sessions[uuidv4].room.sendBroadcastToOperators("<b><i>--- El cliente se ha desconectado. ---</i></b>", operators)
             sessions[uuidv4].room.cleanRoom()
@@ -40,11 +40,11 @@ const interval = setInterval( () => {
         }
     }
     console.log(total, "clientes conectados")
-}, 1000);
+}, 1000)
   
 WebSocketServer.on('close', () => {
-    clearInterval(interval);
-});
+    clearInterval(interval)
+})
 
 
 WebSocketServer.on('connection', (ws, request) => {
@@ -63,7 +63,7 @@ WebSocketServer.on('connection', (ws, request) => {
                 sessionKey,
                 uuidv4 : _uuidv4
             }
-            ws.send(JSON.stringify(registrationMessage));
+            ws.send(JSON.stringify(registrationMessage))
             console.log("New visitor registered with key:", sessionKey, "and uuidv4:", _uuidv4)
         }
         else if(messageObject.type === "register"){
@@ -85,24 +85,24 @@ WebSocketServer.on('connection', (ws, request) => {
                         rooms[i].visitor = visitor
                         rooms[i].websockets = [ws]
 
-                        await rooms[i].sendMessage("<b><i>--- " + visitor.name + " se ha conectado." + " ---</i></b>", operators)
-                        await rooms[i].sendMessage(messageObject.message, operators)
+                        await rooms[i].sendMessageFromClient("<b><i>--- " + visitor.name + " se ha conectado." + " ---</i></b>", operators)
+                        await rooms[i].sendMessageFromClient(messageObject.message, operators)
 
                         sessions[messageObject.uuidv4] =  new Session((new Date()).toUTCString(), rooms[i])
                         
-                        break;
+                        break
                     }
                 }
             }
             else{
-                sessions[messageObject.uuidv4].room.sendMessage(messageObject.message, operators)
+                sessions[messageObject.uuidv4].room.sendMessageFromClient(messageObject.message, operators)
                 if(!sessions[messageObject.uuidv4].room.websockets.includes(ws)){
                     sessions[messageObject.uuidv4].room.websockets.push(ws)
                 }
             }
         }
         
-    });
+    })
     
     const sessionKey = getKey(request)
     console.log(`New conection from: ${sessionKey}`)
@@ -111,5 +111,5 @@ WebSocketServer.on('connection', (ws, request) => {
         message : "conection successfull",
         sessionKey,
     }
-    ws.send(JSON.stringify(firstMessage));
-});
+    ws.send(JSON.stringify(firstMessage))
+})

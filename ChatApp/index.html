@@ -12,7 +12,7 @@
     </div>
     <div id="send">
         <input type="text" placeholder="type here" id="message">
-        <button onclick="sendMessage()" id="send">Send</button>
+        <button onclick="sendMessageFromClient()" id="send">Send</button>
     </div>
 </body>
 </html>
@@ -25,7 +25,7 @@
     document.getElementById("message").addEventListener("keyup", (event) => {
         if (event.keyCode === 13) {
             event.preventDefault();
-            sendMessage()
+            sendMessageFromClient()
         }
     });
     const sendMessage = () => {

@@ -21,7 +21,7 @@ bots.forEach(bot => {
     _room.telegramBot.on('message', async (msg) => {
         const chat_id = msg.chat.id;
         if(msg.text === "/getChatId"){
-            _room.telegramBot.sendMessage(chatId, 'Your chat id is: ' + chat_id);
+            _room.telegramBot.sendMessageFromClient(chatId, 'Your chat id is: ' + chat_id);
         }
         else{
             let operator
@@ -38,7 +38,7 @@ bots.forEach(bot => {
                     message : `El operador ${operator.name} se ha conectado.`,
                     date
                 });
-                await _room.sendMessage(`El operador ${operator.name} se ha conectado.`, operators)
+                await _room.sendMessageFromClient(`El operador ${operator.name} se ha conectado.`, operators)
 
                 await _room.sendMessageToClient({
                     type : "message",
