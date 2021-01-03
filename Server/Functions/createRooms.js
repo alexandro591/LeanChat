@@ -21,7 +21,7 @@ bots.forEach(bot => {
     _room.telegramBot.on('message', async (msg) => {
         const chat_id = msg.chat.id
         if(msg.text === "/getChatId"){
-            _room.telegramBot.sendMessageFromClient(chatId, 'Your chat id is: ' + chat_id)
+            _room.telegramBot.sendMessage(chatId, 'Your chat id is: ' + chat_id)
         }
         else{
             let operator
@@ -33,25 +33,33 @@ bots.forEach(bot => {
                 }
             }
             if(_room.isBusy && !_room.operator){
-                await _room.sendMessageToClient({
-                    type : "message",
-                    message : ` ${operator.name} se ha conectado.`,
+                _room.sendMessageToClient({
+                    type : "botMessage",
+                    message : `El operador ${operator.name} se ha conectado.`,
+                    uuidv4 : _room.visitor.uuidv4,
                     date
                 })
-                await _room.sendMessageFromClient(`<b>El operador ${operator.name} se ha conectado.</b>`, operators)
+                await _room.sendMessageFromClient({
+                    type : "botMessage",
+                    message : `<b>El operador ${operator.name} se ha conectado.</b>`,
+                    uuidv4 : _room.visitor.uuidv4,
+                    date
+                }, operators)
 
-                await _room.sendMessageToClient({
-                    type : "message",
+                _room.sendMessageToClient({
+                    type : "operatorMessage",
                     message : msg.text,
+                    uuidv4 : _room.visitor.uuidv4,
                     date
                 })
                 _room.operator = operator
             }
             else if(_room.isBusy){
                 if(_room.operator.chat_id === chat_id){
-                    await _room.sendMessageToClient({
-                        type : "message",
+                    _room.sendMessageToClient({
+                        type : "operatorMessage",
                         message : msg.text,
+                        uuidv4 : _room.visitor.uuidv4,
                         date
                     })
                 }

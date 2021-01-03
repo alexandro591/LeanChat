@@ -8,34 +8,41 @@ module.exports = class Room{
         this.websockets = websockets
     }
 
-    sendMessageToOperator = async (message) => {
-        await this.telegramBot.sendMessage(this.operator.chat_id, message, {parse_mode : "HTML"})
+    sendMessageToOperator = async (messageObject, log = true) => {
+        await this.telegramBot.sendMessage(this.operator.chat_id, messageObject.message, {parse_mode : "HTML"})
         .catch(() => {})
+        if(log){
+            console.log(">>>", messageObject)
+        }
     }
 
-    sendBroadcastToOperators = async (message, operators) => {
+    sendBroadcastToOperators = async (messageObject, operators, log = true) => {
         await Promise.all(
             operators.map(operator => {
-                return this.telegramBot.sendMessage(operator.chat_id, message, {parse_mode : "HTML"})
+                return this.telegramBot.sendMessage(operator.chat_id, messageObject.message, {parse_mode : "HTML"})
                 .catch(() => {})
             })
         )
+        if(log){
+            console.log(">>>", messageObject)
+        }
     }
 
-    sendMessageFromClient = async (message, operators = null) => {
+    sendMessageFromClient = async (messageObject, operators = null, log = true) => {
         if(this.operator){
-            await this.sendMessageToOperator(message)
+            await this.sendMessageToOperator(messageObject, log)
         }
         else{
-            await this.sendBroadcastToOperators(message, operators)
+            await this.sendBroadcastToOperators(messageObject, operators, log)
         }
     }
-    sendMessageToClient = async (messageObject) => {
-        await Promise.all(
-            this.websockets.map(websocket => {
-                return websocket.send(JSON.stringify(messageObject))
-            })
-        )
+    sendMessageToClient = (messageObject, log = true) => {
+        this.websockets.forEach(websocket => {
+            websocket.send(JSON.stringify(messageObject))
+        })
+        if(log){
+            console.log("<<<", messageObject)
+        }
     }
     cleanRoom = () => {
         this.visitor = null

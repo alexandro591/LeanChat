@@ -7,8 +7,8 @@ const WebSocket = require('ws')
 const uuidv4 = require('uuid').v4
 
 //utils
-const getKey = require('./Utils/getKey')
 const {removeItemAll} = require('./Utils/removeFromArray')
+const getKey = require('./Utils/getKey')
 
 //functions
 const {operators, rooms} = require('./Functions/shared')
@@ -42,12 +42,15 @@ const interval = setInterval( () => {
             }
         })
         if(sessions[uuidv4].websockets().length === 0){
-            sessions[uuidv4].room.sendBroadcastToOperators("<b><i>--- El cliente se ha desconectado. ---</i></b>", operators)
+            sessions[uuidv4].room.sendBroadcastToOperators({
+                type : "botMessage",
+                message  : "<b><i>--- El cliente se ha desconectado. ---</i></b>",
+                uuidv4 : uuidv4
+            }, operators)
             sessions[uuidv4].room.cleanRoom()
             delete sessions[uuidv4]
         }
     }
-    console.log(total, "clientes conectados")
 }, 1000)
   
 WebSocketServer.on('close', () => {
@@ -56,27 +59,30 @@ WebSocketServer.on('close', () => {
 
 
 WebSocketServer.on('connection', (ws, request) => {
-    ws.sessionKey = getKey(request)
     ws.isAlive = true
+    ws.sessionKey = getKey(request)
     ws.on("pong", heartBeat)
-
     ws.on('message', async message => {
+        const date = (new Date()).toUTCString()
         const messageObject = JSON.parse(message)
-        console.log(messageObject)
-        const sessionKey = getKey(request)
+        messageObject.date = date
+        messageObject.sessionKey = ws.sessionKey
+
+        if(messageObject.type !== "register" || messageObject.type === "visitor"){
+            console.log(">>>", messageObject)
+        }
 
         if(messageObject.type === "register"){
             const registrationMessage = {
                 type : "register",
                 message : "registered successfully",
+                uuidv4 : messageObject.uuidv4,
+                date : date
             }
             ws.send(JSON.stringify(registrationMessage))
-            console.log("New visitor registered with key:", sessionKey, "and uuidv4:", messageObject.uuidv4)
+            console.log("<<<", registrationMessage)
         }
-        else if(messageObject.type === "visitor"){
-            console.log(`Visitor ${messageObject.uuidv4} has connected`)
-        }
-        else if(messageObject.type === "message"){
+        else if(messageObject.type === "visitorMessage"){
             if(!sessions[messageObject.uuidv4]){
                 for(let i in rooms){
                     if(!rooms[i].isBusy){
@@ -92,15 +98,21 @@ WebSocketServer.on('connection', (ws, request) => {
                         rooms[i].visitor = visitor
                         rooms[i].websockets = [ws]
 
-                        await rooms[i].sendMessageFromClient("<b><i>--- " + visitor.name + " se ha conectado." + " ---</i></b>", operators)
-                        await rooms[i].sendMessageFromClient(messageObject.message, operators)
+                        await rooms[i].sendMessageFromClient({
+                            type : "botMessage",
+                            message : "<b><i>--- " + visitor.name + " se ha conectado." + " ---</i></b>",
+                            uuidv4 : messageObject.uuidv4,
+                            date
+                        }, operators)
+                        await rooms[i].sendMessageFromClient(messageObject, operators)
 
-                        sessions[messageObject.uuidv4] =  new Session((new Date()).toUTCString(), rooms[i])
+                        sessions[messageObject.uuidv4] =  new Session(date, rooms[i])
                         if(autoBot.enabled){
                             sessions[messageObject.uuidv4].room.sendMessageToClient({
                                 type : "botMessage",
                                 message : autoBot.greet(),
-                                date : (new Date().toUTCString())
+                                uuidv4 : messageObject.uuidv4,
+                                date
                             })
                         }
                         break
@@ -108,7 +120,7 @@ WebSocketServer.on('connection', (ws, request) => {
                 }
             }
             else{
-                sessions[messageObject.uuidv4].room.sendMessageFromClient(messageObject.message, operators)
+                sessions[messageObject.uuidv4].room.sendMessageFromClient(messageObject, operators)
                 if(!sessions[messageObject.uuidv4].websockets().includes(ws)){
                     sessions[messageObject.uuidv4].websockets().push(ws)
                 }
@@ -116,21 +128,25 @@ WebSocketServer.on('connection', (ws, request) => {
                     sessions[messageObject.uuidv4].room.sendMessageToClient({
                         type : "botMessage",
                         message : autoBot.talk(messageObject.message),
+                        uuidv4 : messageObject.uuidv4,
                         date : (new Date().toUTCString())
                     })
                 }
             }
         }
     })
-    
-    const sessionKey = getKey(request)
-    console.log(`New conection from: ${sessionKey}`)
+
+    const date = (new Date()).toUTCString()
     const _uuidv4 = uuidv4()
     const firstMessage = {
         type : "first",
         message : "conection successfull",
-        uuidv4 : _uuidv4
+        uuidv4 : _uuidv4,
+        sessionKey : ws.sessionKey,
+        date
     }
 
     ws.send(JSON.stringify(firstMessage))
+    console.log("<<<", firstMessage)
+
 })
