@@ -1,7 +1,7 @@
-pm2 stop "ChatServer";
-pm2 stop "Bot";
-pm2 flush "ChatServer"
-pm2 flush "Bot"
-pm2 delete "ChatServer";
-pm2 delete "Bot";
-pm2 save --force;
+pm2 stop "LeanChatServer"
+pm2 flush "LeanChatServer"
+pm2 delete "LeanChatServer"
+pm2 stop "LeanChatApp"
+pm2 flush "LeanChatApp"
+pm2 delete "LeanChatApp"
+pm2 save --force
