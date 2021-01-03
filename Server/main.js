@@ -36,12 +36,12 @@ const interval = setInterval( () => {
         total ++
     })
     for(let uuidv4 in sessions){
-        sessions[uuidv4].room.websockets.forEach(ws => {
+        sessions[uuidv4].websockets().forEach(ws => {
             if(!_sessions.includes(ws)){
-                removeItemAll(sessions[uuidv4].room.websockets, ws)
+                removeItemAll(sessions[uuidv4].websockets(), ws)
             }
         })
-        if(sessions[uuidv4].room.websockets.length === 0){
+        if(sessions[uuidv4].websockets().length === 0){
             sessions[uuidv4].room.sendBroadcastToOperators("<b><i>--- El cliente se ha desconectado. ---</i></b>", operators)
             sessions[uuidv4].room.cleanRoom()
             delete sessions[uuidv4]
@@ -103,15 +103,14 @@ WebSocketServer.on('connection', (ws, request) => {
                                 date : (new Date().toUTCString())
                             })
                         }
-
                         break
                     }
                 }
             }
             else{
                 sessions[messageObject.uuidv4].room.sendMessageFromClient(messageObject.message, operators)
-                if(!sessions[messageObject.uuidv4].room.websockets.includes(ws)){
-                    sessions[messageObject.uuidv4].room.websockets.push(ws)
+                if(!sessions[messageObject.uuidv4].websockets().includes(ws)){
+                    sessions[messageObject.uuidv4].websockets().push(ws)
                 }
                 if(autoBot.enabled && !sessions[messageObject.uuidv4].room.operator){
                     sessions[messageObject.uuidv4].room.sendMessageToClient({

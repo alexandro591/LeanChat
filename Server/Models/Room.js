@@ -1,4 +1,4 @@
-module.exports = Room = class{
+module.exports = class Room{
     constructor(name, telegramBot, isBusy = false, visitor = null, operator = null, websockets = null){
         this.name = name
         this.telegramBot = telegramBot

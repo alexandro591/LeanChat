@@ -1,14 +1,26 @@
-module.exports = Session = class{
+module.exports = class Session{
     constructor(date, room){
         this.date = date
         this.room = room
     }
 
-    websockets = this.room?.websockets
+    websockets = () => {
+        return this.room.websockets
+    }
 
-    sendMessageToOperator = this.room?.sendMessageToOperator
-    sendBroadcastToOperators = this.room?.sendBroadcastToOperators
-    sendMessageFromClient = this.room?.sendMessageFromClient
-    sendMessageToClient = this.room?.sendMessageToClient
-    cleanRoom = this.room?.cleanRoom
+    // sendMessageToOperator = () => {
+    //     return this.room.sendMessageToOperator
+    // }
+    // sendBroadcastToOperators = () => {
+    //     return this.room.sendBroadcastToOperators
+    // } 
+    // sendMessageFromClient = () => {
+    //     return this.room.sendMessageFromClient
+    // }
+    // sendMessageToClient = () => {
+    //     return this.room.sendMessageToClient
+    // }
+    // cleanRoom = () => {
+    //     return this.room.cleanRoom
+    // }
 }

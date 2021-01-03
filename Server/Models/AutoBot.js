@@ -1,4 +1,4 @@
-module.exports = AutoBot = class{
+module.exports = class AutoBot{
     constructor(name, enabled){
         this.name = name
         this.enabled = enabled
