@@ -12,7 +12,7 @@ module.exports = class AutoBot{
             message.includes("localizacion") ||
             message.includes("se ubican") ||
             message.includes("estan ubicados")  ||
-            message.includes("google maps") ||
+            message.includes("google maps")
         )
             return "Claro, puedo decir con certeza que nos ubicamos en https://www.google.com"
         if(
