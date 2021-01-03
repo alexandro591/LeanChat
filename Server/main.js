@@ -12,6 +12,7 @@ const {removeItemAll} = require('./Utils/removeFromArray')
 
 //functions
 const {operators, rooms} = require('./Functions/shared')
+const heartBeat = require('./Functions/heartBeat')
 
 //models
 const Session = require('./Models/Session')
@@ -28,6 +29,9 @@ const interval = setInterval( () => {
     let total = 0
     const _sessions = []
     WebSocketServer.clients.forEach( async ws => {
+        if (ws.isAlive === false) return ws.terminate();
+        ws.isAlive = false;
+        ws.ping();
         _sessions.push(ws)
         total ++
     })
@@ -43,7 +47,7 @@ const interval = setInterval( () => {
             delete sessions[uuidv4]
         }
     }
-    // console.log(total, "clientes conectados")
+    console.log(total, "clientes conectados")
 }, 1000)
   
 WebSocketServer.on('close', () => {
@@ -53,6 +57,8 @@ WebSocketServer.on('close', () => {
 
 WebSocketServer.on('connection', (ws, request) => {
     ws.sessionKey = getKey(request)
+    ws.isAlive = true
+    ws.on("pong", heartBeat)
 
     ws.on('message', async message => {
         const messageObject = JSON.parse(message)
