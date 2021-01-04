@@ -8,11 +8,11 @@ const uuidv4 = require('uuid').v4
 
 //utils
 const {removeItemAll} = require('./Utils/removeFromArray')
-const getKey = require('./Utils/getKey')
 
 //functions
 const {operators, rooms} = require('./Functions/shared')
 const heartBeat = require('./Functions/heartBeat')
+const getKey = require('./Functions/getKey')
 
 //models
 const Session = require('./Models/Session')
