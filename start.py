@@ -12,4 +12,4 @@ os.system("npm install")
 os.system(f"pm2 start npm --name \"LeanChatApp\" -- start")
 
 os.system("pm2 startup")
-ps.system("pm2 save")
+os.system("pm2 save")
