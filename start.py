@@ -9,7 +9,7 @@ os.system(f"pm2 start main.js --name \"LeanChatServer\"")
 
 os.chdir(f"{DIR}/ChatApp")
 os.system("npm install")
-os.system(f"pm2 start npm --name \"LeanChatApp\" -- start")
+os.system(f"pm2 start ./bin/www --name \"LeanChatApp\"")
 
 os.system("pm2 startup")
 os.system("pm2 save")
