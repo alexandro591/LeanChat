@@ -41,6 +41,7 @@
     
     if(visitor_name){
         document.getElementById("sendMessage").style.display = "inline"
+        document.getElementById("name").value = visitor_name
     }
     else{
         document.getElementById("connect").style.display = "inline"
@@ -55,6 +56,7 @@
     const sendMessageFromClient = () => {
         const message = document.getElementById("message").value
         visitor_name = document.getElementById("name").value
+        setStorage()
         const messageItem = document.createElement("li")
         const messageObject = {
             message,
@@ -91,14 +93,7 @@
             else if(messageObject.type === "first"){ //handle ping session
                 if(!uuidv4){
                     uuidv4 = messageObject.uuidv4
-                    localStorage.setItem("sessions",JSON.stringify({
-                        uuidv4,
-                        visitor_name,
-                        visitor_first_name,
-                        visitor_last_name,
-                        visitor_email,
-                        visitor_phone
-                    }))
+                    setStorage()
                     socket.send(JSON.stringify({
                         type : "register",
                         message : "register new visitor",
@@ -116,4 +111,17 @@
         } catch (error) {console.error(error)}
     }
 
+</script>
+
+<script>
+    const setStorage = () => {
+        localStorage.setItem("sessions",JSON.stringify({
+            uuidv4,
+            visitor_name,
+            visitor_first_name,
+            visitor_last_name,
+            visitor_email,
+            visitor_phone
+        }))
+    }
 </script>
