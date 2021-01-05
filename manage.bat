@@ -29,17 +29,19 @@ call pm2 stop "LeanChatServer"
     exit /b 1
 )
 
-cd "./Server"
-call npm install
-call pm2 start main.js --name "LeanChatServer"
+if "%*"=="--start" (
+    cd "./Server"
+    call npm install
+    call pm2 start main.js --name "LeanChatServer"
 
-cd "../ChatApp"
-call npm install
-call pm2 start ./bin/www --name "LeanChatApp"
+    cd "../ChatApp"
+    call npm install
+    call pm2 start ./bin/www --name "LeanChatApp"
 
-cd "./public/app"
-call npm install
-call npm run build
+    cd "./public/app"
+    call npm install
+    call npm run build
 
-call pm2 startup
-call pm2 save
+    call pm2 startup
+    call pm2 save
+)
