@@ -47,6 +47,28 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
 <script>
+  const setStorage = () => {
+      localStorage.setItem("session",JSON.stringify({
+        uuidv4,
+        visitor_name,
+        visitor_first_name,
+        visitor_last_name,
+        visitor_email,
+        visitor_phone
+      }))
+  }
+  const getStorage = () => {
+    const session = JSON.parse(localStorage.getItem("session"))
+    uuidv4 = session.uuidv4
+    visitor_name = session.visitor_name
+    visitor_first_name = session.visitor_first_name
+    visitor_last_name = session.visitor_last_name
+    visitor_email = session.visitor_email
+    visitor_phone = session.visitor_phone
+  }
+</script>
+
+<script>
     let uuidv4,
         visitor_name,
         visitor_first_name,
@@ -55,13 +77,8 @@
         visitor_phone
 
     try {
-        uuidv4 = JSON.parse(localStorage.getItem("sessions")).uuidv4
-        visitor_name = JSON.parse(localStorage.getItem("sessions")).visitor_name
-        visitor_first_name = JSON.parse(localStorage.getItem("sessions")).visitor_first_name
-        visitor_last_name = JSON.parse(localStorage.getItem("sessions")).visitor_last_name
-        visitor_email = JSON.parse(localStorage.getItem("sessions")).visitor_email
-        visitor_phone = JSON.parse(localStorage.getItem("sessions")).visitor_phone
-    } catch {}
+        getStorage()
+    } catch (e) {console.log(e)}
     
     if(visitor_name){
         document.getElementById("sendMessage").style.display = "inline"
@@ -81,15 +98,21 @@
         const message = document.getElementById("message").value
         visitor_name = document.getElementById("name").value
         setStorage()
-        const messageItem = document.createElement("li")
         const messageObject = {
-            message,
-            name : visitor_name
+          message,
+          name : visitor_name
         }
-
-        messageItem.innerHTML = messageObject.message
-        document.getElementById("conversation").appendChild(messageItem)
-        document.getElementById("message").value = ""
+        if(document.getElementById("name").value && document.getElementById("connect").style.display == "inline"){
+          document.getElementById("sendMessage").style.display = "inline"
+          document.getElementById("connect").style.display = "none"
+        }
+        else{
+          const messageItem = document.createElement("li")
+          
+          messageItem.innerHTML = messageObject.message
+          document.getElementById("conversation").appendChild(messageItem)
+          document.getElementById("message").value = ""
+        }
 
         socket.send(JSON.stringify({
             ...messageObject,
@@ -135,17 +158,4 @@
         } catch (error) {console.error(error)}
     }
 
-</script>
-
-<script>
-    const setStorage = () => {
-        localStorage.setItem("sessions",JSON.stringify({
-            uuidv4,
-            visitor_name,
-            visitor_first_name,
-            visitor_last_name,
-            visitor_email,
-            visitor_phone
-        }))
-    }
 </script>

@@ -8,5 +8,8 @@ cd "${DIR}/ChatApp"
 npm install
 pm2 start ./bin/www --name "LeanChatApp"
 
+cd "./public/app"
+npm run build
+
 pm2 startup
 pm2 save
