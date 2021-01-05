@@ -2,7 +2,7 @@
 
 DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-if [ "$1" == "--build" ]; then
+if [[ "$1" == "--build" ]]; then
   cd "${DIR}/ChatApp/public/app"
   npm install
   npm run build
