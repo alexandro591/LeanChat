@@ -21,17 +21,26 @@ if [[ "$1" == "--stop" ]]; then
   exit 0
 fi
 
-cd "${DIR}/Server"
-npm install
-pm2 start main.js --name "LeanChatServer"
+if [[ "$1" == "--restart" ]]; then
+  pm2 restart "LeanChatServer"
+  pm2 restart "LeanChatApp"
 
-cd "${DIR}/ChatApp"
-npm install
-pm2 start ./bin/www --name "LeanChatApp"
+  exit 0
+fi
 
-cd "./public/app"
-npm install
-npm run build
+if [[ "$1" == "--start" ]]; then
+  cd "${DIR}/Server"
+  npm install
+  pm2 start main.js --name "LeanChatServer"
 
-pm2 startup
-pm2 save
+  cd "${DIR}/ChatApp"
+  npm install
+  pm2 start ./bin/www --name "LeanChatApp"
+
+  cd "./public/app"
+  npm install
+  npm run build
+
+  pm2 startup
+  pm2 save
+fi
