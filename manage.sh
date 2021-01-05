@@ -1,12 +1,12 @@
 DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-if [ "$1" == "--build" ]; then
+if [[ "$1" == "--build" ]]; then
   cd "${DIR}/ChatApp/public/app"
   npm run build
   exit 0
 fi
 
-if [ "$1" == "--stop" ]; then
+if [[ "$1" == "--stop" ]]; then
   pm2 stop "LeanChatServer"
   pm2 flush "LeanChatServer"
   pm2 delete "LeanChatServer"
