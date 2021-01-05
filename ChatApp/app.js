@@ -4,22 +4,27 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var chat = require('./routes/chat');
+var checkhealth = require('./routes/checkhealth');
 
 var app = express();
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// block for index html being served on / route
+app.use('/', checkhealth);
+app.use('/index.html', checkhealth);
+
+// middlewares for static content
 app.use('/chat/*/init', express.static(path.join(__dirname, './public/app/build'),{
   extensions: ['html', 'htm'],
 }));
+app.use('/', express.static(path.join(__dirname, './public/app/build'),{
+  extensions: ['html', 'htm'],
+}));
 
-app.use('/chiat', chat);
 
 app.use(function(req, res, next) {
   next(createError(404));

@@ -1,8 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/*/init', (request, response) => {
-    console.log(request.url)
+router.get('/', (request, response) => {
     response.send('service running correctly');
 });
 

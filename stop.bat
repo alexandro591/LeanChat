@@ -5,8 +5,4 @@ call pm2 stop "LeanChatApp"
 call pm2 flush "LeanChatApp"
 call pm2 delete "LeanChatApp"
 
-call pm2 stop "LeanChatApp2"
-call pm2 flush "LeanChatApp2"
-call pm2 delete "LeanChatApp2"
-
 call pm2 save --force

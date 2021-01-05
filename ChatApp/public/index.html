@@ -10,9 +10,12 @@
     </div>
     <div id="conversation">
     </div>
-    <div id="send">
+    <div id="sendMessage" style="display: none;">
         <input type="text" placeholder="type here" id="message">
-        <button onclick="sendMessageFromClient()" id="send">Send</button>
+        <button onclick="sendMessageFromClient()" id="send">Enviar</button>
+    </div>
+    <div id="connect" style="display: none;">
+        <button onclick="sendMessageFromClient()" id="start">Iniciar</button>
     </div>
 </body>
 </html>
@@ -20,10 +23,29 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
 <script>
-    let uuidv4
+    let uuidv4,
+        visitor_name,
+        visitor_first_name,
+        visitor_last_name,
+        visitor_email,
+        visitor_phone
+
     try {
         uuidv4 = JSON.parse(localStorage.getItem("sessions")).uuidv4
+        visitor_name = JSON.parse(localStorage.getItem("sessions")).visitor_name
+        visitor_first_name = JSON.parse(localStorage.getItem("sessions")).visitor_first_name
+        visitor_last_name = JSON.parse(localStorage.getItem("sessions")).visitor_last_name
+        visitor_email = JSON.parse(localStorage.getItem("sessions")).visitor_email
+        visitor_phone = JSON.parse(localStorage.getItem("sessions")).visitor_phone
     } catch {}
+    
+    if(visitor_name){
+        document.getElementById("sendMessage").style.display = "inline"
+    }
+    else{
+        document.getElementById("connect").style.display = "inline"
+    }
+
     document.getElementById("message").addEventListener("keyup", (event) => {
         if (event.keyCode === 13) {
             event.preventDefault()
@@ -32,11 +54,11 @@
     })
     const sendMessageFromClient = () => {
         const message = document.getElementById("message").value
-        const name = document.getElementById("name").value
+        visitor_name = document.getElementById("name").value
         const messageItem = document.createElement("li")
         const messageObject = {
             message,
-            name
+            name : visitor_name
         }
 
         messageItem.innerHTML = messageObject.message
@@ -49,9 +71,7 @@
             uuidv4,
         }))
     }
-</script>
 
-<script>
     let socket = new WebSocket(`ws://${window.location.hostname}:9000`)
     console.log("Attempting Connection...")
 
@@ -72,7 +92,12 @@
                 if(!uuidv4){
                     uuidv4 = messageObject.uuidv4
                     localStorage.setItem("sessions",JSON.stringify({
-                        uuidv4
+                        uuidv4,
+                        visitor_name,
+                        visitor_first_name,
+                        visitor_last_name,
+                        visitor_email,
+                        visitor_phone
                     }))
                     socket.send(JSON.stringify({
                         type : "register",
