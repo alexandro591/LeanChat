@@ -2,13 +2,16 @@
 
 DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-if [[ "$1" == "--build" ]]; then
+echo "$1"
+
+if [ "$1" == "--build" ]; then
   cd "${DIR}/ChatApp/public/app"
+  npm install
   npm run build
   exit 0
 fi
 
-if [[ "$1" == "--stop" ]]; then
+if [ "$1" == "--stop" ]; then
   pm2 stop "LeanChatServer"
   pm2 flush "LeanChatServer"
   pm2 delete "LeanChatServer"
@@ -29,6 +32,7 @@ npm install
 pm2 start ./bin/www --name "LeanChatApp"
 
 cd "./public/app"
+npm install
 npm run build
 
 pm2 startup

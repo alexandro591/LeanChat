@@ -4,6 +4,7 @@ cd /d %~dp0
 
 if "%*"=="--build" (
     cd "./ChatApp/public/app"
+    call npm install
     call npm run build
     exit /b 1
 )
@@ -37,6 +38,7 @@ call npm install
 call pm2 start ./bin/www --name "LeanChatApp"
 
 cd "./public/app"
+call npm install
 call npm run build
 
 call pm2 startup
