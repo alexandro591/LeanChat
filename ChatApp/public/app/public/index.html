@@ -29,15 +29,123 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    <div id="top">
+      <input type="text" placeholder="Your Name" id="name"><br>
+    </div>
+    <div id="conversation">
+    </div>
+    <div id="sendMessage" style="display: none;">
+        <input type="text" placeholder="type here" id="message">
+        <button onclick="sendMessageFromClient()" id="send">Enviar</button>
+    </div>
+    <div id="connect" style="display: none;">
+        <button onclick="sendMessageFromClient()" id="start">Iniciar</button>
+    </div>
   </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
+<script>
+    let uuidv4,
+        visitor_name,
+        visitor_first_name,
+        visitor_last_name,
+        visitor_email,
+        visitor_phone
+
+    try {
+        uuidv4 = JSON.parse(localStorage.getItem("sessions")).uuidv4
+        visitor_name = JSON.parse(localStorage.getItem("sessions")).visitor_name
+        visitor_first_name = JSON.parse(localStorage.getItem("sessions")).visitor_first_name
+        visitor_last_name = JSON.parse(localStorage.getItem("sessions")).visitor_last_name
+        visitor_email = JSON.parse(localStorage.getItem("sessions")).visitor_email
+        visitor_phone = JSON.parse(localStorage.getItem("sessions")).visitor_phone
+    } catch {}
+    
+    if(visitor_name){
+        document.getElementById("sendMessage").style.display = "inline"
+        document.getElementById("name").value = visitor_name
+    }
+    else{
+        document.getElementById("connect").style.display = "inline"
+    }
+
+    document.getElementById("message").addEventListener("keyup", (event) => {
+        if (event.keyCode === 13) {
+            event.preventDefault()
+            sendMessageFromClient()
+        }
+    })
+    const sendMessageFromClient = () => {
+        const message = document.getElementById("message").value
+        visitor_name = document.getElementById("name").value
+        setStorage()
+        const messageItem = document.createElement("li")
+        const messageObject = {
+            message,
+            name : visitor_name
+        }
+
+        messageItem.innerHTML = messageObject.message
+        document.getElementById("conversation").appendChild(messageItem)
+        document.getElementById("message").value = ""
+
+        socket.send(JSON.stringify({
+            ...messageObject,
+            type:"visitorMessage",
+            uuidv4,
+        }))
+    }
+
+    let socket = new WebSocket(`ws://${window.location.hostname}:9000`)
+    console.log("Attempting Connection...")
+
+    socket.onopen = event => console.log("Successfully Connected:", event)
+    socket.onclose = event => console.log("Socket Closed Connection:", event)
+    socket.onerror = error => console.log("Socket Closed Connection:", error)
+    socket.onmessage = (message) => {
+        try {
+            const messageObject = JSON.parse(message.data)
+            console.log(messageObject)
+            if(messageObject.type === "operatorMessage" || messageObject.type === "botMessage"){ //handle message
+                const messageItem = document.createElement("li")
+                messageItem.innerHTML = messageObject.message
+                document.getElementById("conversation").appendChild(messageItem)
+                document.getElementById("message").value = ""
+            }
+            else if(messageObject.type === "first"){ //handle ping session
+                if(!uuidv4){
+                    uuidv4 = messageObject.uuidv4
+                    setStorage()
+                    socket.send(JSON.stringify({
+                        type : "register",
+                        message : "register new visitor",
+                        uuidv4
+                    }))
+                }
+                else{
+                    socket.send(JSON.stringify({
+                        type : "visitor",
+                        message : "existing visitor",
+                        uuidv4
+                    }))
+                }
+            }
+        } catch (error) {console.error(error)}
+    }
+
+</script>
+
+<script>
+    const setStorage = () => {
+        localStorage.setItem("sessions",JSON.stringify({
+            uuidv4,
+            visitor_name,
+            visitor_first_name,
+            visitor_last_name,
+            visitor_email,
+            visitor_phone
+        }))
+    }
+</script>
