@@ -2,8 +2,6 @@
 
 DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-echo "$1"
-
 if [ "$1" == "--build" ]; then
   cd "${DIR}/ChatApp/public/app"
   npm install
