@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var check = require('./routes/check');
+var chat = require('./routes/chat');
 
 var app = express();
 
@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public'),{
   extensions: ['html', 'htm'],
 }));
 
-app.use('/test', check);
+app.use('/chat', chat);
 
 app.use(function(req, res, next) {
   next(createError(404));
