@@ -9,7 +9,7 @@ if [[ "$1" == "--build" ]]; then
   exit 0
 fi
 
-if [ "$1" == "--stop" ]; then
+if [[ "$1" == "--stop" ]]; then
   pm2 stop "LeanChatServer"
   pm2 flush "LeanChatServer"
   pm2 delete "LeanChatServer"
